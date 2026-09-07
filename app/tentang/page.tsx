@@ -1,0 +1,3 @@
+export default function AboutPage() {
+  return <main className="shell"><header className="header"><div className="brand">Ide Posting FB Harian</div><h1>Tentang</h1></header><section className="card"><p className="subtitle">Ide Posting FB Harian adalah alat bantu sederhana untuk menemukan ide posting Facebook dan menyusunnya menjadi tulisan yang lebih mudah digunakan.</p><p className="subtitle">Aplikasi ini dibuat dengan prinsip sederhana: pengguna tidak perlu memahami teknologi atau strategi konten yang rumit untuk mulai membuat posting.</p></section><footer className="footer"><a href="/">Beranda</a> · <a href="/privasi">Privasi</a> · <a href="/ketentuan">Ketentuan</a> · <a href="/affiliate">Affiliate</a></footer></main>;
+}
