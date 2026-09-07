@@ -98,7 +98,7 @@ $$;
 
 revoke all on function public.consume_rate_limit(uuid, text, integer, integer) from public, anon, authenticated;
 
-a lter table public.saved_posts enable row level security;
+alter table public.saved_posts enable row level security;
 alter table public.affiliate_clicks enable row level security;
 alter table public.usage_events enable row level security;
 alter table public.rate_limit_buckets enable row level security;
