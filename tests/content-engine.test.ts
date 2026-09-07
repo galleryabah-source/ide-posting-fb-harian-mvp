@@ -23,3 +23,11 @@ test("different niches produce niche-specific output", () => {
   const fashion = generateDailyIdeas("fashion", new Date("2026-09-07T00:00:00+07:00"));
   assert.notDeepEqual(home.map((idea) => idea.title), fashion.map((idea) => idea.title));
 });
+
+test("daily seed follows Jakarta calendar date rather than UTC date", () => {
+  const beforeMidnightUtc = new Date("2026-09-06T17:30:00.000Z");
+  const afterMidnightUtc = new Date("2026-09-06T18:30:00.000Z");
+  const first = generateDailyIdeas("masakan", beforeMidnightUtc);
+  const second = generateDailyIdeas("masakan", afterMidnightUtc);
+  assert.notDeepEqual(first, second);
+});
