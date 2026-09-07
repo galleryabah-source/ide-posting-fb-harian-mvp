@@ -111,6 +111,15 @@ function textSeed(input: string): number {
   return hash;
 }
 
+function localDateKey(date: Date): string {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Jakarta",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(date);
+}
+
 function topicFor(profile: NicheProfile, daySeed: number, offset: number): string {
   return profile.topics[stableIndex(daySeed + offset * 17, profile.topics.length)];
 }
@@ -119,7 +128,7 @@ export function generateDailyIdeas(niche: NicheId, date = new Date()): ContentId
   const profile = PROFILES[niche];
   if (!profile) throw new Error("Niche tidak valid");
 
-  const seed = textSeed(`${niche}:${date.toISOString().slice(0, 10)}`);
+  const seed = textSeed(`${niche}:${localDateKey(date)}`);
   const used = new Set<string>();
   const ideas: ContentIdea[] = [];
 
@@ -135,7 +144,7 @@ export function generateDailyIdeas(niche: NicheId, date = new Date()): ContentId
     used.add(key);
 
     ideas.push({
-      id: `${niche}-${i + 1}-${Math.abs(seed)}`,
+      id: `${niche}-${localDateKey(date)}-${i + 1}-${Math.abs(seed)}`,
       title,
       niche,
       pillar,
