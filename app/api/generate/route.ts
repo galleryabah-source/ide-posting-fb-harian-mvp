@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
-import { generateDailyIdeas, generatePost } from "../../../lib/content-engine";
+import { generateDailyIdeas } from "../../../lib/content-engine";
 import { generateRequestSchema } from "../../../lib/validation";
 import { checkRateLimit } from "../../../lib/server/rate-limit";
 import { ensureVisitorCookie } from "../../../lib/server/request-context";
 import { getSupabaseAdmin } from "../../../lib/server/supabase-admin";
+import { getAiContentProvider } from "../../../lib/server/ai-provider";
 
 export async function POST(request: Request) {
   const visitorId = await ensureVisitorCookie();
@@ -18,15 +19,14 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const parsed = generateRequestSchema.safeParse(body);
-    if (!parsed.success) {
-      return NextResponse.json({ error: "Data permintaan tidak valid." }, { status: 400 });
-    }
+    if (!parsed.success) return NextResponse.json({ error: "Data permintaan tidak valid." }, { status: 400 });
 
     const ideas = generateDailyIdeas(parsed.data.niche, new Date());
     const idea = ideas.find((item) => item.id === parsed.data.ideaId);
     if (!idea) return NextResponse.json({ error: "Ide tidak ditemukan." }, { status: 404 });
 
-    const postText = generatePost(idea);
+    const provider = getAiContentProvider();
+    const postText = await provider.generatePost(idea);
     const supabase = getSupabaseAdmin();
     if (supabase) {
       const { error } = await supabase.from("usage_events").insert({
