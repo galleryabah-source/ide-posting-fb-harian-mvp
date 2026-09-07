@@ -15,11 +15,13 @@ Updated: 2026-09-07
 - [x] Content domain engine
 - [x] Generic advertising contract
 - [x] Generic affiliate contract
-- [x] Public SEO page
-- [x] Legal pages
+- [x] Public SEO pages
+- [x] Legal/disclosure pages
 - [x] robots + sitemap
 - [x] Environment example
 - [x] CI workflow
+- [x] Baseline security response headers
+- [x] Application health endpoint
 
 ### Core MVP
 
@@ -30,22 +32,45 @@ Updated: 2026-09-07
 - [x] Copy action
 - [x] Save action
 - [x] Local fallback storage
+- [x] Server generation endpoint
+- [x] Server save/read/delete endpoints
+- [x] Server affiliate click endpoint
 
-### Hardening remaining
+### Hardening
 
-- [ ] Run CI and resolve any build/type/lint failures.
-- [ ] Server persistence using Supabase/PostgreSQL.
-- [ ] Server-side generation boundary.
-- [ ] Formal request/output schemas.
-- [ ] Server rate limiting.
-- [ ] Persistent content history.
-- [ ] Real affiliate click tracking endpoint.
-- [ ] Production AdSense integration after site/content review and provider approval.
+- [x] Request validation with Zod
+- [x] Safe anonymous visitor cookie
+- [x] AI provider adapter boundary
+- [x] Deterministic AI fallback
+- [x] Bounded rate limiting
+- [x] Database-aware rate-limit path when Supabase is configured
+- [x] HTTPS + approved-host validation for affiliate destinations
+- [x] Unit coverage for content engine and rate limiter
+- [x] Production deployment runbook
+
+### Remaining deployment work
+
+- [ ] Provision a dedicated Supabase project for this repository.
+- [ ] Apply the repository migration only to that dedicated project.
+- [ ] Configure Vercel environment variables.
+- [ ] Run CI on GitHub and resolve any runner failures.
+- [ ] Run runtime E2E smoke test after deployment.
+- [ ] Configure real AdSense publisher ID only after Google review requirements are satisfied.
+- [ ] Configure approved Shopee Affiliate links/provider data only after provider onboarding/compliance review.
+
+### Deferred by design
+
+- [ ] Native mobile app
+- [ ] Broad social auto-publishing
+- [ ] Marketplace
+- [ ] Agency/team accounts
+- [ ] Large analytics suite
+- [ ] Autonomous AI agents
 
 ## Quality standard
 
-A feature is not complete merely because the UI renders. It must pass typecheck, lint, test, build, and relevant integration/smoke checks.
+A feature is complete only after relevant typecheck, lint, unit/integration tests, production build, security review, and runtime smoke checks pass.
 
 ## Monetization rule
 
-The repository is structurally prepared for AdSense and Shopee Affiliate, but no claim is made that provider approval, traffic, commission, or advertising revenue is guaranteed.
+The repository is structurally prepared for AdSense and Shopee Affiliate, but provider approval, traffic, commission, and advertising revenue are never guaranteed by the application code.
