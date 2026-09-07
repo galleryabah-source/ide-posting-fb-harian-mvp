@@ -25,7 +25,7 @@ export async function GET() {
 
 export async function POST(request: Request) {
   const visitorId = await ensureVisitorCookie();
-  const limit = checkRateLimit(`${visitorId}:saved`);
+  const limit = await checkRateLimit(`${visitorId}:saved`, visitorId, "saved");
   if (!limit.allowed) {
     return NextResponse.json(
       { error: "Terlalu banyak permintaan. Coba lagi sebentar lagi." },
@@ -66,7 +66,7 @@ export async function POST(request: Request) {
 
 export async function DELETE(request: Request) {
   const visitorId = await ensureVisitorCookie();
-  const limit = checkRateLimit(`${visitorId}:saved-delete`);
+  const limit = await checkRateLimit(`${visitorId}:saved-delete`, visitorId, "saved-delete");
   if (!limit.allowed) {
     return NextResponse.json({ error: "Terlalu banyak permintaan." }, { status: 429 });
   }
