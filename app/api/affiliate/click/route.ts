@@ -8,8 +8,13 @@ const ALLOWED_HOSTS = new Set(["shopee.co.id", "www.shopee.co.id", "s.shopee.co.
 
 export async function POST(request: Request) {
   const visitorId = await ensureVisitorCookie();
-  const limit = checkRateLimit(`${visitorId}:affiliate-click`);
-  if (!limit.allowed) return NextResponse.json({ error: "Terlalu banyak permintaan." }, { status: 429 });
+  const limit = await checkRateLimit(`${visitorId}:affiliate-click`, visitorId, "affiliate-click");
+  if (!limit.allowed) {
+    return NextResponse.json(
+      { error: "Terlalu banyak permintaan. Coba lagi sebentar lagi." },
+      { status: 429, headers: { "Retry-After": String(limit.retryAfterSeconds) } },
+    );
+  }
 
   try {
     const body = await request.json();
