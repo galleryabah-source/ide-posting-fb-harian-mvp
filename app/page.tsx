@@ -1,6 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { AdSlot } from "../components/ad-slot";
+import { AffiliateDisclosure } from "../components/affiliate-disclosure";
 import {
   generateDailyIdeas,
   generatePost,
@@ -43,14 +45,13 @@ export default function HomePage() {
     try {
       window.localStorage.setItem(SAVED_KEY, JSON.stringify(next));
     } catch {
-      // Local persistence is optional; the app remains usable when storage is blocked.
+      // Storage is optional; the core workflow remains usable.
     }
   }
 
   async function copyPost(idea: ContentIdea) {
-    const post = generatePost(idea);
     try {
-      await navigator.clipboard.writeText(post);
+      await navigator.clipboard.writeText(generatePost(idea));
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     } catch {
@@ -70,14 +71,12 @@ export default function HomePage() {
         <div>
           <div className="label">Tema</div>
           <select className="select" value={niche} onChange={(event) => refreshIdeas(event.target.value as NicheId)}>
-            {niches.map((item) => (
-              <option key={item.id} value={item.id}>{item.label}</option>
-            ))}
+            {niches.map((item) => <option key={item.id} value={item.id}>{item.label}</option>)}
           </select>
         </div>
       </section>
 
-      <div className="ad-slot" aria-label="Tempat iklan">Advertisement</div>
+      <AdSlot slot="app-top" />
 
       <section className="section">
         <div className="label">5 ide hari ini</div>
@@ -113,7 +112,6 @@ export default function HomePage() {
               {saved.includes(selected.id) ? "✓ Disimpan" : "♡ Simpan"}
             </button>
           </div>
-
           {selected.affiliateOpportunity && (
             <div className="affiliate">
               <strong>🛒 Peluang produk</strong>
@@ -123,18 +121,18 @@ export default function HomePage() {
         </section>
       )}
 
+      <AffiliateDisclosure />
       <footer className="footer">
-        Gunakan pengalaman dan informasi yang benar saat mempublikasikan konten. Tautan affiliate harus diberi keterangan yang sesuai.
+        Gunakan pengalaman dan informasi yang benar saat mempublikasikan konten.
         <br /><br />
-        <a href="/tentang">Tentang</a> · <a href="/privasi">Privasi</a> · <a href="/ketentuan">Ketentuan</a> · <a href="/affiliate">Disclosure Affiliate</a>
+        <a href="/tentang">Tentang</a> · <a href="/privasi">Privasi</a> · <a href="/ketentuan">Ketentuan</a> · <a href="/affiliate">Affiliate</a>
       </footer>
 
       <nav className="bottom-nav" aria-label="Navigasi utama">
         <button className="nav-item active">🏠 Beranda</button>
         <button className="nav-item" onClick={() => window.scrollTo({ top: 420, behavior: "smooth" })}>💡 Ide</button>
-        <button className="nav-item" onClick={() => document.getElementById("saved-help")?.scrollIntoView({ behavior: "smooth" })}>❤️ Saya</button>
+        <button className="nav-item" onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}>ℹ️ Info</button>
       </nav>
-      <div id="saved-help" aria-hidden="true" style={{ position: "absolute", bottom: 0 }} />
     </main>
   );
 }
