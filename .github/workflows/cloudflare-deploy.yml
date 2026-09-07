@@ -8,7 +8,7 @@ permissions:
 
 env:
   NODE_VERSION: 24
-  CLOUDFLARE_WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME || 'ide-posting-fb-harian-mvp' }}
+  CLOUDFLARE_WORKER_NAME: ${{ vars.CLOUDFLARE_WORKER_NAME || 'ide-posting-fb' }}
 
 jobs:
   deploy:
