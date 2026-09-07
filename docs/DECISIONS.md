@@ -1,19 +1,28 @@
-# Engineering Decisions
+# ENGINEERING DECISIONS
 
 ## 001 — Small surface, strong engine
-The MVP intentionally has a very small user-facing feature set. Complexity belongs in domain services, not in navigation.
+The MVP intentionally keeps user-facing navigation small. Complexity belongs in domain services and data, not in screens.
 
 ## 002 — AI is optional
-Daily ideas must remain functional without an AI provider. Structured templates and deterministic rules provide the baseline output.
+Daily ideas must remain usable without an AI provider. Deterministic structured content is the baseline; AI improves variation later.
 
-## 003 — Monetization is provider-agnostic
-Advertising and affiliate integrations use adapters/contracts. Provider IDs and credentials never live in content components or client code.
+## 003 — Provider agnostic monetization
+Advertising and affiliate use generic contracts. AdSense and Shopee are integrations, not the application's domain model.
 
 ## 004 — No Shopee scraping dependency
-The product will not depend on crawling or scraping Shopee. Affiliate product/link data must be obtained through mechanisms permitted by the provider/program.
+The app will not require crawling or scraping Shopee. Product/link acquisition must use a mechanism permitted by the applicable affiliate program.
 
-## 005 — Public content is separate from the app
-Public SEO pages are the acquisition/advertising surface. Authenticated app pages prioritize usability and should not be overloaded with advertisements.
+## 005 — Public content is separate
+Public SEO pages are the acquisition and advertising surface. The core creator workflow remains clean and low-friction.
 
 ## 006 — Server boundary for expensive operations
-AI generation, affiliate click tracking, and future persistence must execute through server-side application boundaries with validation and rate limits.
+AI generation, persistence, usage accounting, and outbound tracking belong behind server-side application boundaries.
+
+## 007 — Graceful degradation
+A provider failure must degrade to a usable deterministic experience rather than a broken page.
+
+## 008 — No guaranteed-income claims
+Copy and product messaging must not claim guaranteed virality, sales, commission, or income.
+
+## 009 — No premature scale architecture
+Start as a modular monolith. Split services only when actual traffic or operational evidence requires it.
