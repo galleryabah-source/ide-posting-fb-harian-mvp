@@ -3,6 +3,8 @@ import { AdSlot } from "../../components/ad-slot";
 import { AffiliateDisclosure } from "../../components/affiliate-disclosure";
 import { generateDailyIdeas } from "../../lib/content-engine";
 
+export const revalidate = 86400;
+
 export const metadata: Metadata = {
   title: "Ide Posting Facebook Hari Ini | Ide Posting FB Harian",
   description: "Lima inspirasi ide posting Facebook untuk hari ini yang bisa kamu sesuaikan dengan pengalaman dan gaya tulisanmu.",
