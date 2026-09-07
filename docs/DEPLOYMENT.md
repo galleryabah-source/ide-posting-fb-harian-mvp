@@ -28,16 +28,17 @@ Apply `supabase/migrations/20260907000000_initial_app_schema.sql` only to the de
 
 The migration enables RLS and intentionally provides no direct anonymous table policies. Server routes use the server-only key after request validation.
 
-## 4. Production sequence
+## 4. Health and production verification
 
-1. Create/configure the dedicated Supabase project.
-2. Apply the migration.
-3. Add environment variables in Vercel.
-4. Deploy from `main`.
-5. Verify `/`, `/ide-postingan-facebook`, `/ide-postingan-facebook-hari-ini`, `/robots.txt`, and `/sitemap.xml`.
-6. Exercise generate/save endpoints.
-7. Review logs and error rate.
-8. Configure approved AdSense and Shopee Affiliate identifiers/links only after provider onboarding and policy review.
+After deployment:
+
+1. Open `/api/health`.
+2. Expect HTTP 200 with `database: "ok"` when the dedicated Supabase project is configured and healthy.
+3. Verify `/`, `/ide-postingan-facebook`, `/ide-postingan-facebook-hari-ini`, `/robots.txt`, and `/sitemap.xml`.
+4. Exercise generate/save endpoints.
+5. Verify affiliate tracking rejects non-HTTPS or unapproved destinations.
+6. Verify repeated generation requests eventually return HTTP 429.
+7. Review Vercel runtime logs for errors.
 
 ## 5. Monetization safeguards
 
@@ -57,4 +58,8 @@ The migration enables RLS and intentionally provides no direct anonymous table p
 
 `npm run build`
 
-Then perform a browser smoke test on mobile viewport before production promotion.
+Then perform a browser smoke test on a mobile viewport before production promotion.
+
+## 7. Rollback
+
+If a deployment is unhealthy, revert to the last known-good Vercel deployment. Do not modify database structure as a first response to an application deployment failure.
