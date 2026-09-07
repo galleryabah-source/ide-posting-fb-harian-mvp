@@ -1,0 +1,62 @@
+name: Cloudflare Deploy
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: 24
+
+jobs:
+  deploy:
+    name: Deploy to Cloudflare Workers
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: production
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install current app dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Initialize vinext for Cloudflare
+        run: npx vinext@latest init --skip-check --platform=cloudflare
+
+      - name: Validate required Cloudflare secrets
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          VINEXT_KV_NAMESPACE_ID: ${{ secrets.VINEXT_KV_NAMESPACE_ID }}
+        run: |
+          test -n "$CLOUDFLARE_ACCOUNT_ID" || { echo "Missing CLOUDFLARE_ACCOUNT_ID"; exit 1; }
+          test -n "$CLOUDFLARE_API_TOKEN" || { echo "Missing CLOUDFLARE_API_TOKEN"; exit 1; }
+          test -n "$VINEXT_KV_NAMESPACE_ID" || { echo "Missing VINEXT_KV_NAMESPACE_ID"; exit 1; }
+
+      - name: Configure vinext KV namespace
+        env:
+          VINEXT_KV_NAMESPACE_ID: ${{ secrets.VINEXT_KV_NAMESPACE_ID }}
+        shell: bash
+        run: |
+          test -f wrangler.jsonc
+          sed -i "s/<your-kv-namespace-id>/$VINEXT_KV_NAMESPACE_ID/g" wrangler.jsonc
+          grep -q "$VINEXT_KV_NAMESPACE_ID" wrangler.jsonc || {
+            echo "KV namespace ID was not written to wrangler.jsonc";
+            exit 1;
+          }
+
+      - name: Build Cloudflare target
+        run: npm run build:vinext
+
+      - name: Deploy
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+        run: npx @vinext/cloudflare deploy
