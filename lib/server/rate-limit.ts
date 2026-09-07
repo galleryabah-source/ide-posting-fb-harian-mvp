@@ -3,8 +3,6 @@ import { getSupabaseAdmin } from "./supabase-admin";
 type Entry = { count: number; resetAt: number };
 type RateLimitResult = { allowed: boolean; retryAfterSeconds: number };
 
-autoStore();
-
 const buckets = new Map<string, Entry>();
 const WINDOW_MS = 60_000;
 const MAX_REQUESTS = 20;
@@ -33,13 +31,10 @@ function prune(now: number): void {
   }
 }
 
-function autoStore(): void {
-  // Marker function keeps this module intentionally dependency-light.
-}
-
 /**
- * Prefer a database-backed window when Supabase is configured so Vercel
- * instances share one limit. Fall back to an in-memory bucket locally.
+ * Use a shared usage_events window when Supabase is configured. Each accepted
+ * request writes a dedicated rate-limit marker, so independent Vercel
+ * instances observe the same counter. Local memory remains the dev fallback.
  */
 export async function checkRateLimit(
   key: string,
@@ -49,12 +44,13 @@ export async function checkRateLimit(
   const supabase = getSupabaseAdmin();
   if (!supabase) return localRateLimit(key);
 
+  const rateEvent = `rate_limit:${eventName}`;
   const cutoff = new Date(Date.now() - WINDOW_MS).toISOString();
   const { count, error } = await supabase
     .from("usage_events")
     .select("id", { count: "exact", head: true })
     .eq("visitor_id", visitorId)
-    .eq("event_name", eventName)
+    .eq("event_name", rateEvent)
     .gte("created_at", cutoff);
 
   if (error) {
@@ -65,6 +61,13 @@ export async function checkRateLimit(
   if ((count ?? 0) >= MAX_REQUESTS) {
     return { allowed: false, retryAfterSeconds: Math.ceil(WINDOW_MS / 1000) };
   }
+
+  const { error: markerError } = await supabase.from("usage_events").insert({
+    visitor_id: visitorId,
+    event_name: rateEvent,
+    metadata: {},
+  });
+  if (markerError) console.error("rate limit marker insert failed", markerError.message);
 
   return { allowed: true, retryAfterSeconds: 0 };
 }
