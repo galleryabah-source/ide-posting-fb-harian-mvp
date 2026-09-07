@@ -96,7 +96,10 @@ begin
 end;
 $$;
 
+-- The RPC is server-only: the browser roles cannot execute it, while the
+-- server-side Supabase service role can call it explicitly.
 revoke all on function public.consume_rate_limit(uuid, text, integer, integer) from public, anon, authenticated;
+grant execute on function public.consume_rate_limit(uuid, text, integer, integer) to service_role;
 
 alter table public.saved_posts enable row level security;
 alter table public.affiliate_clicks enable row level security;
