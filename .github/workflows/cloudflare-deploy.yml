@@ -71,7 +71,17 @@ jobs:
           }
           fs.writeFileSync(configPath, JSON.stringify(config, null, 2) + '\n');
           NODE
-          node -e "const c=require('./wrangler.jsonc'); if(c.name!==process.env.CLOUDFLARE_WORKER_NAME) process.exit(1); console.log('Worker:', c.name); console.log('KV binding configured.');"
+          node <<'NODE'
+          const fs = require('node:fs');
+          const config = JSON.parse(fs.readFileSync('wrangler.jsonc', 'utf8'));
+          if (config.name !== process.env.CLOUDFLARE_WORKER_NAME) process.exit(1);
+          const hasKv = (config.kv_namespaces ?? []).some(
+            (namespace) => namespace.binding === 'VINEXT_KV_CACHE' && namespace.id,
+          );
+          if (!hasKv) process.exit(1);
+          console.log('Worker:', config.name);
+          console.log('KV binding configured.');
+          NODE
 
       - name: Build Cloudflare target
         run: npm run build:vinext
