@@ -8,7 +8,7 @@ import { getAiContentProvider } from "../../../lib/server/ai-provider";
 
 export async function POST(request: Request) {
   const visitorId = await ensureVisitorCookie();
-  const limit = checkRateLimit(`${visitorId}:generate`);
+  const limit = await checkRateLimit(`${visitorId}:generate`, visitorId, "generate");
   if (!limit.allowed) {
     return NextResponse.json(
       { error: "Terlalu banyak permintaan. Coba lagi sebentar lagi." },
