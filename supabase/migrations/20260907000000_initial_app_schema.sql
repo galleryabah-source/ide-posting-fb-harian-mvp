@@ -41,6 +41,9 @@ create table if not exists public.usage_events (
 create index if not exists usage_events_name_created_idx
   on public.usage_events (event_name, created_at desc);
 
+create index if not exists usage_events_visitor_event_created_idx
+  on public.usage_events (visitor_id, event_name, created_at desc);
+
 alter table public.saved_posts enable row level security;
 alter table public.affiliate_clicks enable row level security;
 alter table public.usage_events enable row level security;
